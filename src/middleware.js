@@ -2,9 +2,9 @@ import { defineMiddleware } from "astro/middleware";
 
 export const onRequest = defineMiddleware((context, next) => {
 	// localhostの場合は、next()を呼び出す
-	// if (context.url.hostname === "localhost") {
-	// 	return next();
-  // }
+	if (context.url.hostname === "localhost") {
+		return next();
+  }
   
   const name = import.meta.env.BASIC_USERNAME;
   const pass = import.meta.env.BASIC_PASSWORD;
