@@ -1,34 +1,36 @@
-// const authorization = Astro.request.headers.get("authorization");
+import { defineMiddleware } from "astro/middleware";
 
-// const BASIC_AUTH = Astro.locals.runtime.env.BASIC_AUTH;
-// const BASIC_USERNAME = Astro.locals.runtime.env.BASIC_USERNAME;
-// const BASIC_PASSWORD = Astro.locals.runtime.env.BASIC_PASSWORD;
+export const onRequest = defineMiddleware((context, next) => {
+	// localhostの場合は、next()を呼び出す
+	if (context.url.hostname === "localhost") {
+		return next();
+	}
 
-// if (authorization) {
-//     if (BASIC_AUTH === "true") {
-//       const buffer = Buffer.from(pieces[1], "base64");
-//       const credentials = buffer.toString();
-//       console.log(credentials);
-//       const [username, password] = credentials.split(":");
+  // If a basic auth header is present, it wil take the string form: "Basic authValue"
+	const basicAuth = context.request.headers.get("authorization");
+	
+  if (basicAuth) {
+    // Get the auth value from string "Basic authValue"
+    const authValue = basicAuth.split(" ")[1] ?? "username:password";
 
-//       if (username === BASIC_USERNAME && password === BASIC_PASSWORD) {
-//         Astro.response.status = 200;
-//         Astro.response.headers.delete("WWW-Authenticate");
-//         Astro.response.headers.delete("Content-Length");
-//       }
-//     }
-  
-// } else {
-//   Astro.response.status = 401;
-//   Astro.response.headers.set("WWW-Authenticate", 'Basic realm="realm"');
-//   Astro.response.headers.set("Content-Length", "0");
-// }
+    // Decode the Base64 encoded string via atob (https://developer.mozilla.org/en-US/docs/Web/API/atob)
+    // Get the username and password. NB: the decoded string is in the form "username:password"
+    const [username, pwd] = atob(authValue).split(":");
 
-export function onRequest ({ locals, request }, next) {
-    // レスポンスデータをリクエストからインターセプトします
-    // 必要に応じて、`locals`を改変してレスポンスを加工します
-    locals.title = "新しいタイトル";
+    // check if the username and password are valid
+    if (
+      username === import.meta.env.SECRET_NAME &&
+      pwd === import.meta.env.SECRET_PASSWORD
+    ) {
+      // forward request
+      return next();
+    }
+  }
 
-    // Responseか`next()`の結果を返します
-    return next();
-};
+  return new Response("Auth required", {
+    status: 401,
+    headers: {
+      "WWW-authenticate": 'Basic realm="Secure Area"',
+    },
+  });
+});
