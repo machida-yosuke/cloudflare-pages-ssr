@@ -3,6 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import Card from '../components/Card.astro';
 
 const now = new Date()
+const localizedTime = new Date(now.toLocaleString({ timeZone: 'Asia/Tokyo' }));
+
 const animes = await fetch('https://api.jikan.moe/v4/anime').then(res => res.json())
 
 ---
@@ -38,7 +40,7 @@ const animes = await fetch('https://api.jikan.moe/v4/anime').then(res => res.jso
 			</defs>
 		</svg>
 		<h1>Welcome to <span class="text-gradient">zero trust認証動的サイト</span></h1>
-		<h2>現在<span class="text-gradient">{`${now.getHours()}時${now.getMinutes()}分${now.getSeconds()}秒`}</span>です</h2>
+		<h2>現在<span class="text-gradient">{`${localizedTime.getHours()}時${localizedTime.getMinutes()}分${localizedTime.getSeconds()}秒`}</span>です</h2>
 		
 
 		<p class="instructions">
