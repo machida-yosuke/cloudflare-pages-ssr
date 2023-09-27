@@ -9,9 +9,6 @@ export const onRequest = defineMiddleware((context, next) => {
   const name = import.meta.env.BASIC_USERNAME;
   const pass = import.meta.env.BASIC_PASSWORD;
 
-  console.log(name, pass);
-
-
   // If a basic auth header is present, it wil take the string form: "Basic authValue"
 	const basicAuth = context.request.headers.get("authorization");
 	
@@ -27,7 +24,6 @@ export const onRequest = defineMiddleware((context, next) => {
     // check if the username and password are valid
     if (username === name && pwd === pass) {
       // forward request
-      console.log('next');
       return next();
     }
   }
