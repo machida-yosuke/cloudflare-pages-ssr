@@ -1,6 +1,10 @@
 import { defineMiddleware } from "astro/middleware";
 
 export const onRequest = defineMiddleware((context, next) => {
+
+  const name = import.meta.env.BASIC_PASSWORD;
+  const pass = import.meta.env.BASIC_USERNAME;
+
 	// localhostの場合は、next()を呼び出す
 	if (context.url.hostname === "localhost") {
 		return next();
@@ -18,10 +22,7 @@ export const onRequest = defineMiddleware((context, next) => {
     const [username, pwd] = atob(authValue).split(":");
 
     // check if the username and password are valid
-    if (
-      username === import.meta.env.SECRET_NAME &&
-      pwd === import.meta.env.SECRET_PASSWORD
-    ) {
+    if (username === name && pwd === pass) {
       // forward request
       return next();
     }
