@@ -1,19 +1,22 @@
 import { defineMiddleware } from "astro/middleware";
 
 export const onRequest = defineMiddleware((context, next) => {
-
-  const name = import.meta.env.BASIC_PASSWORD;
-  const pass = import.meta.env.BASIC_USERNAME;
-
 	// localhostの場合は、next()を呼び出す
-	if (context.url.hostname === "localhost") {
-		return next();
-	}
+	// if (context.url.hostname === "localhost") {
+	// 	return next();
+  // }
+  
+  const name = import.meta.env.BASIC_USERNAME;
+  const pass = import.meta.env.BASIC_PASSWORD;
+
+  console.log(name, pass);
+
 
   // If a basic auth header is present, it wil take the string form: "Basic authValue"
 	const basicAuth = context.request.headers.get("authorization");
 	
   if (basicAuth) {
+    console.log("basicAuth");
     // Get the auth value from string "Basic authValue"
     const authValue = basicAuth.split(" ")[1] ?? "username:password";
 
@@ -24,6 +27,7 @@ export const onRequest = defineMiddleware((context, next) => {
     // check if the username and password are valid
     if (username === name && pwd === pass) {
       // forward request
+      console.log('next');
       return next();
     }
   }
